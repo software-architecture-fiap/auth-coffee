@@ -1,0 +1,39 @@
+########## This is used only for test purposes ##########
+########## Important: To validate the application, use Kubernetes with Kind as described in infra/README.md
+services:
+  db:
+    image: postgres:latest
+    environment:
+      POSTGRES_DB: challenge
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: localhost@1988
+    ports:
+      - "5432:5432"
+    volumes:
+      - db-data:/var/lib/postgresql/data
+
+  web:
+    build: .
+    ports:
+      - "9000:8080"
+    depends_on:
+      - db
+    environment:
+      DATABASE_URL: postgresql://postgres:localhost%401988@db:5432/challenge
+    volumes:
+      - logs:/app/logs
+    command: poetry run uvicorn app.main:app --host 0.0.0.0 --port 9000 --reload
+
+  tests:
+    build: .
+    depends_on:
+      - db
+    environment:
+      DATABASE_URL: postgresql://postgres:localhost%401988@db:5432/challenge
+    volumes:
+      - logs:/app/logs
+    command: poetry run pytest -vv
+
+volumes:
+  db-data:
+  logs:
