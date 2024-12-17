@@ -24,9 +24,6 @@ functions:
       - httpApi:
           path: /{proxy+}
           method: ANY
-      - httpApi:
-        path: /token
-        method: POST
 
 plugins:
   - serverless-dotenv-plugin
